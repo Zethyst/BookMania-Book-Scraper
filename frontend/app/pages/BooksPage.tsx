@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useProducts } from "../hooks/useProducts";
 import { useCategories } from "../hooks/useCategories";
+import { BookGridSkeleton } from "../components/LoadingSkeleton";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -316,9 +317,7 @@ const BooksPage = () => {
         )}
 
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader className="h-10 w-10 text-amber-600 animate-spin" />
-          </div>
+          <BookGridSkeleton count={limit} />
         ) : data && data.items.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
