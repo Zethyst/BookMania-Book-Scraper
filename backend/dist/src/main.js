@@ -6,9 +6,30 @@ const swagger_1 = require("@nestjs/swagger");
 const app_module_1 = require("./app.module");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const allowedOrigins = [
+        'https://book-mania-book-scraper.vercel.app',
+        process.env.FRONTEND_URL,
+        'http://localhost:3000',
+    ].filter(Boolean);
     app.enableCors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: (origin, callback) => {
+            if (!origin)
+                return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                callback(null, true);
+            }
+            else {
+                if (process.env.NODE_ENV === 'development') {
+                    callback(null, true);
+                }
+                else {
+                    callback(new Error('Not allowed by CORS'));
+                }
+            }
+        },
         credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
@@ -30,6 +51,7 @@ async function bootstrap() {
     console.log(`🚀 Application is running on: http://localhost:${port}`);
     console.log(`📚 API Documentation: http://localhost:${port}/api/docs`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 CORS enabled for origins: ${allowedOrigins.join(', ')}`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
